@@ -1,48 +1,62 @@
-// Nombre del caché
-const CACHE_NAME = "apptodo-v1";
+// ===============================
+// Service Worker - Apptodo
+// ===============================
+
+// Nombre del caché (cámbialo con cada actualización importante)
+const CACHE_NAME = "apptodo-v2"; // ⬅️ cambia el número al subir una nueva versión
 
 // Archivos a guardar en caché
 const urlsToCache = [
-"/",
-"/index.html",
-"/calendario.html",
-"/diario.html",
-"/finanzas.html",
-"/tareas.html",
-"/perfil.html",
-"/manifest.json",
-"/icons/icon-192.png",
-"/icons/icon-512.png"
+  "/",
+  "/index.html",
+  "/calendario.html",
+  "/diario.html",
+  "/finanzas.html",
+  "/tareas.html",
+  "/perfil.html",
+  "/manifest.json",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png"
 ];
 
-// ✅ INSTALACIÓN - Se guarda todo en caché
+// ✅ INSTALACIÓN - Guarda los archivos en caché y activa al instante
 self.addEventListener("install", (event) => {
-event.waitUntil(
+  console.log("Instalando nuevo Service Worker...");
+  self.skipWaiting(); // 🔁 fuerza la activación inmediata del nuevo SW
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-    console.log("Archivos cacheados correctamente");
-    return cache.addAll(urlsToCache);
-})
-);
-});
-
-// 🧹 ACTIVACIÓN - Elimina cachés antiguos
-self.addEventListener("activate", (event) => {
-event.waitUntil(
-    caches.keys().then((keys) =>
-    Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-    )
-    )
-);
-console.log("Service Worker activado correctamente");
-});
-
-// ⚙️ FETCH - Responde con caché o red
-self.addEventListener("fetch", (event) => {
-event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Devuelve desde caché o hace fetch si no existe
-    return response || fetch(event.request);
+      console.log("Archivos cacheados correctamente");
+      return cache.addAll(urlsToCache);
     })
-);
+  );
+});
+
+// 🧹 ACTIVACIÓN - Elimina cachés antiguos y actualiza todas las pestañas abiertas
+self.addEventListener("activate", (event) => {
+  console.log("Service Worker activado y limpiando cachés viejas...");
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      )
+    )
+  );
+  self.clients.claim(); // ⚡ aplica la nueva versión a todos los usuarios
+});
+
+// ⚙️ FETCH - Responde con caché o red (funciona incluso offline)
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return (
+        response ||
+        fetch(event.request).then((networkResponse) => {
+          // Opcional: guarda en caché nuevos recursos si lo deseas
+          return networkResponse;
+        })
+      );
+    })
+  );
 });
