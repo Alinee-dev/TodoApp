@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tareas Minimalista</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    
+    <style>
+        /* -----------------------------
+            Estilos generales y fuente
+        ----------------------------- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #f0f4f8 0%, #ffffff 100%);
+            margin: 0;
+            padding-bottom: 80px; /* espacio para bottom bar */
+            color: #2c3e50;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3436;
+            font-size: 2rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* -----------------------------
+            Input de nuevas tareas
+        ----------------------------- */
+        .task-input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 25px auto 30px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        #new-task-input {
+            flex-grow: 1;
+            padding: 12px 14px;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        #new-task-input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 6px rgba(52,152,219,0.3);
+        }
+
+        .add-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+
+        /* -----------------------------
+            Sección Única de Tareas
+        ----------------------------- */
+        .task-section {
+            background: #fdfdfd;
+            border: 1px solid #ececec;
+            border-radius: 10px;
+            padding: 15px 20px; /* Reducción de padding para más minimalismo */
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+        }
+        
+        /* Título de sección ELIMINADO según solicitud */
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0px; /* Reducción de padding horizontal */
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s, opacity 0.3s;
+        }
+
+        .task-list li:last-child {
+            border-bottom: none;
+        }
+
+        .task-list li:hover {
+            background-color: transparent;
+        }
+
+        .task-text {
+            flex-grow: 1;
+            margin-left: 10px;
+            font-size: 1rem;
+            color: #34495e;
+            transition: all 0.3s;
+        }
+        
+        /* Estilo para tarea completada (TACHAR Y ENGRISAR) */
+        li.completed .task-text {
+            text-decoration: line-through; 
+            color: #95a5a6;
+        }
+
+        /* Checkbox */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #2ecc71; 
+        }
+
+        /* Botón eliminar */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.1rem; /* Icono más pequeño */
+            transition: all 0.2s;
+            opacity: 0.5; /* Más sutil */
+            padding: 5px;
+        }
+
+        .delete-btn:hover {
+            color: #c0392b;
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* -----------------------------
+            Bottom Bar (NO MODIFICAR)
+        ----------------------------- */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
+
+        .bottom-bar a {
+            color: #444;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .bottom-bar img {
+            width: 28px;
+            height: 28px;
+            filter: brightness(0) invert(0);
+            transition: 0.3s;
+        }
+
+        .bottom-bar a.active img,
+        .bottom-bar a:hover img {
+            filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
+
+            .task-section {
+                padding: 15px;
+            }
+        }
+    </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0078d7">
+
+<script>
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+    .then(() => console.log('Service Worker activo ✅'))
+    .catch(err => console.log('Error SW ❌', err));
+});
+}
+</script>
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>☑️ Mi Lista</h1>
+
+        <div class="task-input-container">
+            <input type="text" id="new-task-input" placeholder="Añadir tarea..." aria-label="Añadir nueva tarea">
+            <button id="add-task-btn" class="add-btn">Añadir</button>
+        </div>
+
+        <div class="task-section">
+            <ul id="task-list" class="task-list"></ul>
+            <p id="empty-message" class="empty-message" style="display: none;">¡Parece que tienes tiempo libre! ✨</p>
+        </div>
+        
+    </div>
+
+    <div class="bottom-bar">
+        <a href="index.html" class="active"><img src="images/inicio.png" alt="Inicio"></a>
+        <a href="Calendario.html" class="active"><img src="images/calendario.png" alt="Calendario"></a>
+        <a href="Tareas.html" class="active"><img src="images/tareas.png" alt="Tareas"></a>
+        <a href="Diario.html" class="active"><img src="images/diario.png" alt="Diario"></a>
+        <a href="Finanzas.html" class="active"><img src="images/finanzas.png" alt="Finanzas"></a>
+        <a href="Perfil.html" class="active"><img src="images/perfil.png" alt="Perfil"></a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('new-task-input');
+            const addButton = document.getElementById('add-task-btn');
+            const taskList = document.getElementById('task-list');
+            const emptyMessage = document.getElementById('empty-message');
+            
+            // Usamos un nombre de almacenamiento distinto para evitar conflictos
+            let tasks = JSON.parse(localStorage.getItem('minimalToggleTodoTasks')) || []; 
+            let nextTaskId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+
+            function saveTasks() {
+                localStorage.setItem('minimalToggleTodoTasks', JSON.stringify(tasks));
+            }
+
+            function renderTasks() {
+                taskList.innerHTML = '';
+
+                // Ordenar: Pendientes (false) primero, Completadas (true) al final
+                tasks.sort((a, b) => a.completed - b.completed); 
+
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = task.completed ? 'completed' : 'pending';
+                    li.dataset.id = task.id;
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = task.completed;
+                    checkbox.addEventListener('change', () => toggleTask(task.id));
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'task-text';
+                    textSpan.textContent = task.text;
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-btn';
+                    deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>'; 
+                    deleteButton.title = 'Eliminar tarea';
+                    deleteButton.addEventListener('click', () => deleteTask(task.id));
+
+                    li.appendChild(checkbox);
+                    li.appendChild(textSpan);
+                    li.appendChild(deleteButton);
+                    taskList.appendChild(li);
+                });
+
+                emptyMessage.style.display = tasks.length === 0 ? 'block' : 'none';
+                saveTasks();
+            }
+
+            function addTask(text) {
+                const trimmedText = text.trim();
+                if (trimmedText === "") return;
+
+                const newTask = {
+                    id: nextTaskId++,
+                    text: trimmedText,
+                    completed: false
+                };
+
+                // Añadimos la nueva tarea y re-renderizamos para que se ordene correctamente (arriba)
+                tasks.push(newTask);
+                input.value = '';
+                renderTasks();
+            }
+
+            function toggleTask(id) {
+                const task = tasks.find(t => t.id === id);
+                if (task) {
+                    task.completed = !task.completed; 
+                    renderTasks(); // Re-renderiza para que la tarea se mueva al final o suba
+                }
+            }
+
+            function deleteTask(id) {
+                tasks = tasks.filter(t => t.id !== id);
+                renderTasks();
+            }
+
+            // --- Event Listeners ---
+            addButton.addEventListener('click', () => addTask(input.value));
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask(input.value);
+            });
+
+            // --- Inicialización ---
+            renderTasks();
+        });
+    </script>
+</body>
+</html>

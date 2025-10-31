@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inicio - Apptodo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=home" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0078d7">
+<script>
+if ("serviceWorker" in navigator) {
+window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+    .then(() => console.log("Service Worker activo ✅"))
+    .catch(err => console.log("Error SW ❌", err));
+});
+}
+</script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+            padding-bottom: 80px; /* espacio para el bottom bar */
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .main-greeting {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+
+        .balance-summary-widget,
+        .tasks-summary-widget,
+        .events-widget {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            border-left: 5px solid #3498db;
+        }
+
+        .widget-title {
+            color: #34495e;
+            margin-top: 0;
+            font-size: 1.3rem;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .summary-amount {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .summary-positive { color: #27ae60; }
+        .summary-negative { color: #e74c3c; }
+
+        .task-summary-list,
+        .event-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-summary-list li,
+        .event-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dotted #ecf0f1;
+            font-size: 0.95rem;
+        }
+
+        .task-summary-list li:first-child {
+            font-weight: bold;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 5px;
+        }
+
+        .task-summary-count, .event-date { font-weight: bold; color: #3498db; }
+
+        /* ===============================
+            Bottom Bar (NO MODIFICAR)
+        ============================== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
+
+        .bottom-bar a {
+            color: #444;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .bottom-bar a span.material-symbols-outlined {
+            font-size: 28px; /* tamaño del icono */
+            margin-bottom: 4px;
+            transition: transform 0.2s, color 0.2s;
+            color: #555; /* Color del icono por defecto (Gris Oscuro) */
+        }
+
+        .bottom-bar img {
+            width: 28px; /* ajusta el tamaño según tu diseño */
+            height: 28px;
+            filter: brightness(0) invert(0); /* vuelve el ícono oscuro */
+            transition: 0.3s;
+        }
+
+        .bottom-bar a.active img,
+        .bottom-bar a:hover img {
+            filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1); /* tono azul al hacer hover o estar activo */
+        }
+        .bottom-bar a.active span.material-symbols-outlined {
+            transform: translateY(-3px) scale(1.1);
+            color: #3498db;
+        }
+
+        .bottom-bar a.active span {
+            color: #3498db;
+        }
+
+        .bottom-bar a:hover span.material-symbols-outlined {
+            transform: translateY(-2px);
+            color: #3498db;
+        }
+
+        .bottom-bar a:hover span {
+            color: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-bar { padding: 8px 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="main-greeting">Hola<span id="greeting-name"></span></h1>
+        <p id="current-date" style="color: #444; margin-top: -10px;"></p>
+        <p id="motivational-quote" style="font-style: italic; color: #7f8c8d; margin-top: 15px;"></p>
+
+        <div class="balance-summary-widget">
+            <h2 class="widget-title">Resumen de Balance 💰</h2>
+            <p id="balance-summary" class="summary-amount">Cargando...</p>
+        </div>
+
+        <div class="tasks-summary-widget">
+            <h2 class="widget-title">Tareas Pendientes 🎯</h2>
+            <ul id="upcoming-tasks-list" class="task-summary-list"></ul>
+            <p id="no-tasks-message" style="display: none; color: #7f8c8d; text-align: center; padding: 5px;">
+                ¡Gran trabajo! Tareas completadas. ✅
+            </p>
+        </div>
+
+        <div class="events-widget">
+            <h2 class="widget-title">Próximos Eventos 🗓️</h2>
+            <ul id="upcoming-events-list" class="event-list">
+                <li id="events-loading">Cargando eventos...</li>
+            </ul>
+            <p id="no-events-message" style="display: none; color: #7f8c8d; text-align: center; padding: 10px;">
+                ¡Genial! No hay eventos próximos. 🎉
+            </p>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <a href="index.html" class="active"><img src="images/inicio.png" alt="Inicio"></a>
+        <a href="Calendario.html" class="active"><img src="images/calendario.png" alt="Calendario"></a>
+        <a href="Tareas.html" class="active"><img src="images/tareas.png" alt="Tareas"></a>
+        <a href="Diario.html" class="active"><img src="images/diario.png" alt="Diario"></a>
+        <a href="Finanzas.html" class="active"><img src="images/finanzas.png" alt="Finanzas"></a>
+        <a href="Perfil.html" class="active"><img src="images/perfil.png" alt="Perfil"></a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. Bienvenida ---
+            let userName = localStorage.getItem('userName');
+            const greetingElement = document.getElementById('greeting-name');
+
+            if (!userName) {
+                userName = prompt("¡Bienvenido! Por favor, ingresa tu nombre:");
+                if (userName && userName.trim() !== "") {
+                    localStorage.setItem('userName', userName.trim());
+                } else { userName = "Usuario"; }
+            }
+
+            if (greetingElement) {
+                greetingElement.textContent = " " + userName.trim() + "!";
+            }
+
+            // --- 2. Fecha ---
+            const dateElement = document.getElementById('current-date');
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('es-ES', options);
+            dateElement.textContent = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+            // --- 3. Frase motivacional ---
+            const quoteElement = document.getElementById('motivational-quote');
+            const quotes = [
+                "El único modo de hacer un gran trabajo es amar lo que haces. 🚀",
+                "El éxito no es la clave de la felicidad. La felicidad es la clave del éxito. ✨",
+                "Empieza donde estás. Usa lo que tienes. Haz lo que puedes. 💪",
+                "La mejor forma de predecir el futuro es creándolo. 💡",
+                "No dejes que el miedo de perder sea mayor que la emoción de ganar. 🥇",
+                "Un viaje de mil millas comienza con un solo paso. 👣",
+                "El fracaso es solo la oportunidad de comenzar de nuevo, pero con más inteligencia. 🧠",
+                "Cree en ti, incluso cuando nadie más lo haga. ✨",
+                "Con cada amanecer, tienes una nueva oportunidad para ser feliz. 🌅",
+                "Cada nuevo día es una nueva oportunidad para cambiar tu vida. 🗓️"
+            ];
+            quoteElement.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+
+            // --- 4. Formato CLP ---
+            function formatCLP(amount) {
+                return new Intl.NumberFormat('es-CL', {
+                    style: 'currency',
+                    currency: 'CLP',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(Math.round(amount)).replace('CLP','').trim();
+            }
+
+            // --- 5. Balance ---
+            function loadFinanceBalance() {
+                const transactions = JSON.parse(localStorage.getItem('financeTransactions')) || [];
+                const balanceElement = document.getElementById('balance-summary');
+                const total = transactions.reduce((acc, trans) => {
+                    const amount = Number(trans.amount) || 0;
+                    return trans.type === 'income' ? acc + amount : acc - amount;
+                }, 0);
+                balanceElement.textContent = formatCLP(total);
+                balanceElement.classList.remove('summary-positive','summary-negative');
+                balanceElement.classList.add(total >= 0 ? 'summary-positive' : 'summary-negative');
+            }
+
+            // --- 6. Tareas ---
+            function loadUpcomingTasks() {
+                // CLAVE ACTUALIZADA para coincidir con la versión minimalista
+                const tasks = JSON.parse(localStorage.getItem('minimalToggleTodoTasks')) || []; 
+                const pendingListElement = document.getElementById('upcoming-tasks-list');
+                const noTasksMessage = document.getElementById('no-tasks-message');
+
+                const pendingTasks = tasks.filter(t => !t.completed).slice(0, 5);
+                pendingListElement.innerHTML = '';
+
+                if (pendingTasks.length > 0) {
+                    noTasksMessage.style.display = 'none';
+                    const totalPending = tasks.filter(t => !t.completed).length;
+                    const summaryLi = document.createElement('li');
+                    summaryLi.innerHTML = `<span>Total Pendiente:</span><span class="task-summary-count">${totalPending}</span>`;
+                    pendingListElement.appendChild(summaryLi);
+
+                    pendingTasks.forEach(task => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<span>${task.text}</span>`;
+                        pendingListElement.appendChild(li);
+                    });
+                } else { noTasksMessage.style.display = 'block'; }
+            }
+
+            // --- 7. Eventos ---
+            function loadUpcomingEvents() {
+                const eventsData = JSON.parse(localStorage.getItem('calendarEvents')) || {};
+                const eventListElement = document.getElementById('upcoming-events-list');
+                const noEventsMessage = document.getElementById('no-events-message');
+                const loading = document.getElementById('events-loading');
+                if (loading) loading.remove();
+
+                const upcomingEvents = [];
+                const now = new Date(); now.setHours(0,0,0,0);
+
+                for (const dateKey in eventsData) {
+                    if (eventsData.hasOwnProperty(dateKey)) {
+                        const parts = dateKey.split('-');
+                        const eventDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+                        eventDate.setHours(0,0,0,0);
+                        if (eventDate.getTime() >= now.getTime()) {
+                            eventsData[dateKey].forEach(e => upcomingEvents.push({ date: eventDate, name: e }));
+                        }
+                    }
+                }
+
+                upcomingEvents.sort((a,b) => a.date - b.date);
+                eventListElement.innerHTML = '';
+
+                if (upcomingEvents.length > 0) {
+                    noEventsMessage.style.display = 'none';
+                    upcomingEvents.slice(0,5).forEach(event => {
+                        const li = document.createElement   ('li');
+                        const displayDate = event.date.toLocaleDateString('es-ES',{ month:'short', day:'numeric' }).toUpperCase();
+                        li.innerHTML = `<span>${event.name}</span><span class="event-date">${displayDate}</span>`;
+                        eventListElement.appendChild(li);
+                    });
+                } else { noEventsMessage.style.display = 'block'; }
+            }
+
+            loadUpcomingEvents();
+            loadFinanceBalance();
+            loadUpcomingTasks();
+        });
+    </script>   
+</body>
+</html>

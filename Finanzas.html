@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Finanzas 💰</title>
+    <style>
+        /* ----------------------------------- */
+        /* --- Estilos del Widget de Finanzas --- */
+        /* ----------------------------------- */
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .balance-widget, .transaction-form-container, .history-widget {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            background-color: #fff;
+        }
+
+        /* Balance */
+        .balance-widget {
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            transition: color 0.3s;
+        }
+
+        .positive {
+            color: #27ae60; /* Verde */
+        }
+
+        .negative {
+            color: #e74c3c; /* Rojo */
+        }
+
+        /* Formulario */
+        .transaction-form-container {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+        }
+
+        #transaction-form label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        #transaction-form input, #transaction-form select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .add-transaction-btn {
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .add-transaction-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Historial */
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .transaction-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1rem;
+        }
+
+        .transaction-list li:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-list li span:nth-child(1) {
+            flex-grow: 1;
+            font-size: 1rem;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            padding: 0 10px;
+            text-align: right;
+        }
+
+        .income {
+            color: #27ae60;
+        }
+
+        .expense {
+            color: #e74c3c;
+        }
+
+        .delete-trans-btn {
+            background: none;
+            border: none;
+            color: #95a5a6;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1rem;
+            transition: color 0.3s;
+            opacity: 0.8;
+        }
+
+        .delete-trans-btn:hover {
+            color: #e74c3c;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 15px 0;
+        }
+
+                /* ===============================
+            Bottom Bar
+        ============================== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
+
+        .bottom-bar a {
+            color: #444;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .bottom-bar a span.material-symbols-outlined {
+            font-size: 28px; /* tamaño del icono */
+            margin-bottom: 4px;
+            transition: transform 0.2s, color 0.2s;
+            color: #555; /* Color del icono por defecto (Gris Oscuro) */
+        }
+
+        .bottom-bar img {
+    width: 28px; /* ajusta el tamaño según tu diseño */
+    height: 28px;
+    filter: brightness(0) invert(0); /* vuelve el ícono oscuro */
+    transition: 0.3s;
+}
+
+.bottom-bar a.active img,
+.bottom-bar a:hover img {
+    filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1); /* tono azul al hacer hover o estar activo */
+}
+        .bottom-bar a.active span.material-symbols-outlined {
+            transform: translateY(-3px) scale(1.1);
+            color: #3498db;
+        }
+
+        .bottom-bar a.active span {
+            color: #3498db;
+        }
+
+        .bottom-bar a:hover span.material-symbols-outlined {
+            transform: translateY(-2px);
+            color: #3498db;
+        }
+
+        .bottom-bar a:hover span {
+            color: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-bar { padding: 8px 0; }
+        }
+    </style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0078d7">
+
+<script>
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+    .then(() => console.log('Service Worker activo ✅'))
+    .catch(err => console.log('Error SW ❌', err));
+});
+}
+</script>
+
+</head>
+<body>
+
+<div class="container">
+    <h1>💰 Mis Finanzas</h1>
+
+    <div class="balance-widget">
+        <h2>Balance Actual</h2>
+        <p id="current-balance" class="balance-amount">Cargando...</p>
+    </div>
+
+    <div class="transaction-form-container">
+        <h2>Registrar Transacción</h2>
+        <form id="transaction-form">
+
+            <label for="type">Tipo:</label>
+            <select id="type" required>
+                <option value="income">Ingreso (+)</option>
+                <option value="expense">Gasto (-)</option>
+            </select>
+
+            <label for="description">Descripción:</label>
+            <input type="text" id="description" placeholder="Ej: Sueldo, Alquiler, Café..." required>
+
+            <label for="amount">Monto:</label>
+            <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required>
+
+            <button type="submit" class="add-transaction-btn">Añadir Transacción</button>
+        </form>
+    </div>
+
+    <div class="history-widget">
+        <h2>Historial de Transacciones</h2>
+        <ul id="transactions-list" class="transaction-list">
+            <li id="no-transactions-msg" class="empty-message">No hay transacciones registradas.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ===============================
+        Bottom Bar
+    ============================== -->
+    <div class="bottom-bar">
+        <a href="index.html" class="active"><img src="images/inicio.png" alt="Inicio"></a>
+        <a href="Calendario.html" class="active"><img src="images/calendario.png" alt="Calendario"></a>
+        <a href="Tareas.html" class="active"><img src="images/tareas.png" alt="Tareas"></a>
+        <a href="Diario.html" class="active"><img src="images/diario.png" alt="Diario"></a>
+        <a href="Finanzas.html" class="active"><img src="images/finanzas.png" alt="Finanzas"></a>
+        <a href="Perfil.html" class="active"><img src="images/perfil.png" alt="Perfil"></a>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('transaction-form');
+        const balanceDisplay = document.getElementById('current-balance');
+        const list = document.getElementById('transactions-list');
+        const noTransactionsMsg = document.getElementById('no-transactions-msg');
+
+        let transactions = JSON.parse(localStorage.getItem('financeTransactions')) || [];
+        let nextTransId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+
+        function saveTransactions() {
+            localStorage.setItem('financeTransactions', JSON.stringify(transactions));
+        }
+
+        function calculateBalance() {
+            return transactions.reduce((acc, trans) => {
+                return trans.type === 'income' ? acc + trans.amount : acc - trans.amount;
+            }, 0);
+        }
+
+        function formatCLP(amount) {
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(Math.round(amount)).replace('CLP', '').trim();
+        }
+
+        function renderFinances() {
+            list.innerHTML = '';
+
+            if (transactions.length === 0) {
+                noTransactionsMsg.style.display = 'block';
+                list.appendChild(noTransactionsMsg);
+            } else {
+                noTransactionsMsg.style.display = 'none';
+            }
+
+            [...transactions].reverse().forEach(trans => {
+                const li = document.createElement('li');
+                const sign = trans.type === 'income' ? '+' : '-';
+                const formattedAmount = `${sign} ${formatCLP(trans.amount)}`;
+
+                li.innerHTML = `
+                    <span>${trans.description}</span>
+                    <span class="transaction-amount ${trans.type}">${formattedAmount}</span>
+                    <button class="delete-trans-btn" data-id="${trans.id}">🗑️</button>
+                `;
+
+                list.appendChild(li);
+            });
+
+            const balance = calculateBalance();
+            balanceDisplay.textContent = formatCLP(balance);
+            balanceDisplay.className = 'balance-amount ' + (balance >= 0 ? 'positive' : 'negative');
+
+            saveTransactions();
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+
+            const type = document.getElementById('type').value;
+            const description = document.getElementById('description').value;
+            const amountInput = document.getElementById('amount').value;
+
+            if (!description || !amountInput) return;
+
+            const amount = Math.round(parseFloat(amountInput));
+
+            const newTransaction = {
+                id: nextTransId++,
+                description: description.trim(),
+                amount: amount,
+                type: type
+            };
+
+            transactions.push(newTransaction);
+            form.reset();
+            renderFinances();
+        }
+
+        function deleteTransaction(id) {
+            transactions = transactions.filter(trans => trans.id !== id);
+            renderFinances();
+        }
+
+        list.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-trans-btn')) {
+                const id = parseInt(e.target.dataset.id);
+                if (confirm('¿Estás seguro de que quieres eliminar esta transacción?')) {
+                    deleteTransaction(id);
+                }
+            }
+        });
+
+        form.addEventListener('submit', addTransaction);
+
+        renderFinances();
+    });
+</script>
+
+</body>
+</html>
