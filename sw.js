@@ -1,9 +1,9 @@
 // ===============================
-// Service Worker - Apptodo
+// Service Worker - Apptodo (AutoUpdate)
 // ===============================
 
 // 💡 Cambia este número en cada versión nueva
-const CACHE_NAME = "apptodo-v5";
+const CACHE_NAME = "apptodo-v7";
 
 // Archivos a guardar en caché
 const urlsToCache = [
@@ -19,10 +19,10 @@ const urlsToCache = [
   "/icons/icon-512.png"
 ];
 
-// ✅ INSTALACIÓN - Guarda los archivos en caché y activa al instante
+// ✅ INSTALACIÓN - Guarda en caché y fuerza activación inmediata
 self.addEventListener("install", (event) => {
-  console.log("🔧 Instalando nuevo Service Worker...");
-  self.skipWaiting(); // activa el nuevo SW sin esperar
+  console.log("⚙️ Instalando nuevo Service Worker...");
+  self.skipWaiting(); // 🚀 activa de inmediato sin esperar al anterior
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log("📦 Archivos cacheados correctamente");
@@ -31,35 +31,37 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// 🧹 ACTIVACIÓN - Elimina cachés antiguos y actualiza todas las pestañas abiertas
+// 🧹 ACTIVACIÓN - Elimina cachés antiguos y recarga todas las pestañas
 self.addEventListener("activate", (event) => {
-  console.log("🧽 Activando y limpiando cachés antiguas...");
+  console.log("🧽 Activando nueva versión y limpiando cachés viejas...");
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
       )
     )
   );
 
-  // 🔁 Recarga las pestañas abiertas con la nueva versión
-  self.clients.claim();
-  self.clients.matchAll({ type: "window" }).then((clients) => {
-    clients.forEach((client) => client.navigate(client.url));
-  });
+  // 🔁 Fuerza actualización en todas las instancias abiertas
+  event.waitUntil(
+    (async () => {
+      const clientsList = await self.clients.matchAll({ type: "window" });
+      for (const client of clientsList) {
+        client.navigate(client.url); // 🔄 recarga automáticamente
+      }
+    })()
+  );
+
+  self.clients.claim(); // aplica el nuevo SW incluso en apps instaladas
 });
 
-// ⚙️ FETCH - Responde con caché o red
+// ⚙️ FETCH - Usa caché primero, luego red
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
+    caches.match(event.request).then((cachedResponse) => {
       return (
-        response ||
-        fetch(event.request).then((networkResponse) => {
-          return networkResponse;
-        })
+        cachedResponse ||
+        fetch(event.request).then((networkResponse) => networkResponse)
       );
     })
   );
