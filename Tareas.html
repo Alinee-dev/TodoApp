@@ -5,6 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Lista de Tareas Minimalista</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+if ('serviceWorker' in navigator) {
+  // ✅ Registrar Service Worker
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("✅ Service Worker registrado"))
+    .catch(err => console.error("❌ Error al registrar SW:", err));
+
+  // 📢 Escuchar si el SW avisa una nueva versión
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "NEW_VERSION") {
+      console.log("🆕 Nueva versión disponible");
+
+      // Mostrar mensaje visual antes de recargar
+      const msg = document.createElement("div");
+      msg.textContent = "🔄 Actualizando Apptodo...";
+      msg.style.position = "fixed";
+      msg.style.bottom = "20px";
+      msg.style.left = "50%";
+      msg.style.transform = "translateX(-50%)";
+      msg.style.background = "#2ecc71";
+      msg.style.color = "white";
+      msg.style.padding = "12px 20px";
+      msg.style.borderRadius = "10px";
+      msg.style.fontWeight = "bold";
+      msg.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+      msg.style.zIndex = "9999";
+      document.body.appendChild(msg);
+
+      // Espera un poco y recarga la app
+      setTimeout(() => window.location.reload(), 1500);
+    }
+  });
+}
+</script>
 
     
     <style>
@@ -233,16 +267,6 @@
     </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffffff">
-
-<script>
-if ('serviceWorker' in navigator) {
-window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-    .then(() => console.log('Service Worker activo ✅'))
-    .catch(err => console.log('Error SW ❌', err));
-});
-}
-</script>
 
 </head>
 

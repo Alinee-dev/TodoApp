@@ -4,6 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Perfil</title>
+
+    <script>
+if ('serviceWorker' in navigator) {
+  // ✅ Registrar Service Worker
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("✅ Service Worker registrado"))
+    .catch(err => console.error("❌ Error al registrar SW:", err));
+
+  // 📢 Escuchar si el SW avisa una nueva versión
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "NEW_VERSION") {
+      console.log("🆕 Nueva versión disponible");
+
+      // Mostrar mensaje visual antes de recargar
+      const msg = document.createElement("div");
+      msg.textContent = "🔄 Actualizando Apptodo...";
+      msg.style.position = "fixed";
+      msg.style.bottom = "20px";
+      msg.style.left = "50%";
+      msg.style.transform = "translateX(-50%)";
+      msg.style.background = "#2ecc71";
+      msg.style.color = "white";
+      msg.style.padding = "12px 20px";
+      msg.style.borderRadius = "10px";
+      msg.style.fontWeight = "bold";
+      msg.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+      msg.style.zIndex = "9999";
+      document.body.appendChild(msg);
+
+      // Espera un poco y recarga la app
+      setTimeout(() => window.location.reload(), 1500);
+    }
+  });
+}
+</script>
+
     <style>
         body {
             background-color: #f7f9fc;
@@ -87,8 +123,7 @@
             color: #2c3e50;
         }
 
-        .profile-field input,
-        .profile-field select {
+        .profile-field input {
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
@@ -141,20 +176,72 @@
             transition: 0.3s;
         }
 
-        .export-btn {
-            background-color: #3498db;
+        .export-btn { background-color: #3498db; }
+        .export-btn:hover { background-color: #2980b9; }
+        .import-btn { background-color: #9b59b6; }
+        .import-btn:hover { background-color: #8e44ad; }
+
+        /* --- BLOC DE NOTAS --- */
+        .notes-container {
+            margin-top: 35px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .export-btn:hover {
-            background-color: #2980b9;
+        .notes-container h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #34495e;
         }
 
-        .import-btn {
-            background-color: #9b59b6;
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            color: #333;
+            transition: border 0.3s;
         }
 
-        .import-btn:hover {
-            background-color: #8e44ad;
+        textarea:focus {
+            border-color: #3498db;
+        }
+
+        .note-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        .note-actions button {
+            flex: 1;
+            padding: 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .save-note { background-color: #3498db; }
+        .save-note:hover { background-color: #2980b9; }
+
+        .clear-note { background-color: #e74c3c; }
+        .clear-note:hover { background-color: #c0392b; }
+
+        .note-status {
+            text-align: center;
+            color: #27ae60;
+            margin-top: 10px;
+            font-weight: bold;
         }
 
         /* ===============================
@@ -207,25 +294,12 @@
                 width: 24px;
                 height: 24px;
             }
-
-            .bottom-bar a {
-                font-size: 11px;
-            }
+            .bottom-bar a { font-size: 11px; }
         }
     </style>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ffffff">
-
-<script>
-if ('serviceWorker' in navigator) {
-window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-    .then(() => console.log('Service Worker activo ✅'))
-    .catch(err => console.log('Error SW ❌', err));
-});
-}
-</script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
 
 </head>
 <body>
@@ -255,29 +329,27 @@ window.addEventListener('load', () => {
                 <label for="userBio">Descripción</label>
                 <input type="text" id="userBio" placeholder="Algo sobre ti...">
             </div>
-
-            <div class="profile-field">
-                <label for="userMood">Estado de ánimo</label>
-                <select id="userMood">
-                    <option value="">Selecciona tu estado</option>
-                    <option value="😊 Feliz">😊 Feliz</option>
-                    <option value="😐 Normal">😐 Normal</option>
-                    <option value="😞 Triste">😞 Triste</option>
-                    <option value="😡 Enojado">😡 Enojado</option>
-                    <option value="🤔 Pensativo">🤔 Pensativo</option>
-                    <option value="😴 Cansado">😴 Cansado</option>
-                    <option value="😎 Motivado">😎 Motivado</option>
-                </select>
-            </div>
         </div>
 
         <button class="edit-profile-btn" id="saveProfileBtn">Guardar Cambios</button>
+
         <div class="backup-buttons">
             <button class="export-btn" id="exportBtn">📤 Exportar Todo</button>
             <button class="import-btn" id="importBtn">📥 Importar Todo</button>
         </div>
 
         <p id="statusMessage" class="status-message"></p>
+
+        <!-- 🧠 Bloc rápido de ideas -->
+        <div class="notes-container">
+            <h2>🧠 Bloc rápido</h2>
+            <textarea id="quickNote" placeholder="Escribe tus ideas, pensamientos o recordatorios..."></textarea>
+            <div class="note-actions">
+                <button class="save-note" id="saveNote">💾 Guardar</button>
+                <button class="clear-note" id="clearNote">🗑️ Borrar</button>
+            </div>
+            <p id="noteStatus" class="note-status"></p>
+        </div>
     </div>
 
     <!-- ===============================
@@ -297,7 +369,6 @@ window.addEventListener('load', () => {
             const userNameInput = document.getElementById('userName');
             const userEmailInput = document.getElementById('userEmail');
             const userBioInput = document.getElementById('userBio');
-            const userMoodSelect = document.getElementById('userMood');
             const userNameDisplay = document.getElementById('userNameDisplay');
             const saveProfileBtn = document.getElementById('saveProfileBtn');
             const statusMessage = document.getElementById('statusMessage');
@@ -305,23 +376,24 @@ window.addEventListener('load', () => {
             const changePhotoBtn = document.getElementById('changePhotoBtn');
             const exportBtn = document.getElementById('exportBtn');
             const importBtn = document.getElementById('importBtn');
+            const noteTextarea = document.getElementById('quickNote');
+            const saveNoteBtn = document.getElementById('saveNote');
+            const clearNoteBtn = document.getElementById('clearNote');
+            const noteStatus = document.getElementById('noteStatus');
 
-            // Cargar datos desde localStorage
+            // 🧩 Cargar perfil
             const savedProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
             if (savedProfile.name) userNameInput.value = savedProfile.name;
             if (savedProfile.email) userEmailInput.value = savedProfile.email;
             if (savedProfile.bio) userBioInput.value = savedProfile.bio;
-            if (savedProfile.mood) userMoodSelect.value = savedProfile.mood;
             if (savedProfile.image) profileImage.src = savedProfile.image;
             if (savedProfile.name) userNameDisplay.textContent = savedProfile.name;
 
-            // Guardar cambios
             saveProfileBtn.addEventListener('click', () => {
                 const profileData = {
                     name: userNameInput.value.trim(),
                     email: userEmailInput.value.trim(),
                     bio: userBioInput.value.trim(),
-                    mood: userMoodSelect.value,
                     image: profileImage.src
                 };
                 localStorage.setItem('userProfile', JSON.stringify(profileData));
@@ -330,7 +402,7 @@ window.addEventListener('load', () => {
                 setTimeout(() => { statusMessage.textContent = ""; }, 3000);
             });
 
-            // Cambiar foto
+            // 📸 Cambiar foto
             changePhotoBtn.addEventListener('click', () => {
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
@@ -339,9 +411,7 @@ window.addEventListener('load', () => {
                     const file = event.target.files[0];
                     if (file) {
                         const reader = new FileReader();
-                        reader.onload = () => {
-                            profileImage.src = reader.result;
-                        };
+                        reader.onload = () => { profileImage.src = reader.result; };
                         reader.readAsDataURL(file);
                     }
                 };
@@ -390,6 +460,31 @@ window.addEventListener('load', () => {
                     reader.readAsText(file);
                 };
                 input.click();
+            });
+
+            // 🧠 Bloc rápido
+            const savedNote = localStorage.getItem('quickNote');
+            if (savedNote) noteTextarea.value = savedNote;
+
+            noteTextarea.addEventListener('input', () => {
+                localStorage.setItem('quickNote', noteTextarea.value);
+                noteStatus.textContent = "Guardado automáticamente...";
+                setTimeout(() => noteStatus.textContent = "", 1500);
+            });
+
+            saveNoteBtn.addEventListener('click', () => {
+                localStorage.setItem('quickNote', noteTextarea.value);
+                noteStatus.textContent = "Nota guardada ✅";
+                setTimeout(() => noteStatus.textContent = "", 2000);
+            });
+
+            clearNoteBtn.addEventListener('click', () => {
+                if (confirm("¿Deseas borrar tu nota?")) {
+                    noteTextarea.value = "";
+                    localStorage.removeItem('quickNote');
+                    noteStatus.textContent = "Nota eliminada 🗑️";
+                    setTimeout(() => noteStatus.textContent = "", 2000);
+                }
             });
         });
     </script>
