@@ -87,7 +87,8 @@
             color: #2c3e50;
         }
 
-        .profile-field input {
+        .profile-field input,
+        .profile-field select {
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
@@ -254,6 +255,20 @@ window.addEventListener('load', () => {
                 <label for="userBio">Descripción</label>
                 <input type="text" id="userBio" placeholder="Algo sobre ti...">
             </div>
+
+            <div class="profile-field">
+                <label for="userMood">Estado de ánimo</label>
+                <select id="userMood">
+                    <option value="">Selecciona tu estado</option>
+                    <option value="😊 Feliz">😊 Feliz</option>
+                    <option value="😐 Normal">😐 Normal</option>
+                    <option value="😞 Triste">😞 Triste</option>
+                    <option value="😡 Enojado">😡 Enojado</option>
+                    <option value="🤔 Pensativo">🤔 Pensativo</option>
+                    <option value="😴 Cansado">😴 Cansado</option>
+                    <option value="😎 Motivado">😎 Motivado</option>
+                </select>
+            </div>
         </div>
 
         <button class="edit-profile-btn" id="saveProfileBtn">Guardar Cambios</button>
@@ -282,6 +297,7 @@ window.addEventListener('load', () => {
             const userNameInput = document.getElementById('userName');
             const userEmailInput = document.getElementById('userEmail');
             const userBioInput = document.getElementById('userBio');
+            const userMoodSelect = document.getElementById('userMood');
             const userNameDisplay = document.getElementById('userNameDisplay');
             const saveProfileBtn = document.getElementById('saveProfileBtn');
             const statusMessage = document.getElementById('statusMessage');
@@ -295,6 +311,7 @@ window.addEventListener('load', () => {
             if (savedProfile.name) userNameInput.value = savedProfile.name;
             if (savedProfile.email) userEmailInput.value = savedProfile.email;
             if (savedProfile.bio) userBioInput.value = savedProfile.bio;
+            if (savedProfile.mood) userMoodSelect.value = savedProfile.mood;
             if (savedProfile.image) profileImage.src = savedProfile.image;
             if (savedProfile.name) userNameDisplay.textContent = savedProfile.name;
 
@@ -304,6 +321,7 @@ window.addEventListener('load', () => {
                     name: userNameInput.value.trim(),
                     email: userEmailInput.value.trim(),
                     bio: userBioInput.value.trim(),
+                    mood: userMoodSelect.value,
                     image: profileImage.src
                 };
                 localStorage.setItem('userProfile', JSON.stringify(profileData));

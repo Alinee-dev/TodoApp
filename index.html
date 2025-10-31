@@ -90,111 +90,88 @@ window.addEventListener("load", () => {
 
         .task-summary-count, .event-date { font-weight: bold; color: #3498db; }
 
-/* ===============================
-   Bottom Bar (Versión adaptada para iPhone y PC)
-=============================== */
-.bottom-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #f5f5f5;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 18px 0; /* 🔹 más alto por defecto */
-    padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* 🔹 asegura altura en iPhone */
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-    border-top: 1px solid #ddd;
-    z-index: 9999;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
+        /* ===============================
+            Bottom Bar (NO MODIFICAR)
+        ============================== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* <- IMPORTANTE */
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
 
-.bottom-bar a {
-    color: #444;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 15px; /* 🔹 más grande para pantallas táctiles */
-    transition: 0.3s;
-    line-height: 1.4;
-}
+        .bottom-bar a {
+            color: #444;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            transition: 0.3s;
+        }
 
-.bottom-bar a span.material-symbols-outlined {
-    font-size: 40px; /* 🔹 íconos grandes en iPhone */
-    margin-bottom: 6px;
-    transition: transform 0.2s, color 0.2s;
-    color: #555;
-    -webkit-tap-highlight-color: transparent;
-}
+        .bottom-bar a span.material-symbols-outlined {
+            font-size: 28px; /* tamaño del icono */
+            margin-bottom: 4px;
+            transition: transform 0.2s, color 0.2s;
+            color: #555; /* Color del icono por defecto (Gris Oscuro) */
+        }
 
-.bottom-bar img {
-    width: 40px;
-    height: 40px;
-    filter: brightness(0) invert(0);
-    transition: 0.3s;
-    -webkit-tap-highlight-color: transparent;
-}
+        .bottom-bar img {
+            width: 28px; /* ajusta el tamaño según tu diseño */
+            height: 28px;
+            filter: brightness(0) invert(0); /* vuelve el ícono oscuro */
+            transition: 0.3s;
+        }
 
-.bottom-bar a.active img,
-.bottom-bar a:hover img {
-    filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1);
-}
+        .bottom-bar a.active img,
+        .bottom-bar a:hover img {
+            filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1); /* tono azul al hacer hover o estar activo */
+        }
+        .bottom-bar a.active span.material-symbols-outlined {
+            transform: translateY(-3px) scale(1.1);
+            color: #3498db;
+        }
 
-.bottom-bar a.active span.material-symbols-outlined {
-    transform: translateY(-3px) scale(1.1);
-    color: #3498db;
-}
+        .bottom-bar a.active span {
+            color: #3498db;
+        }
 
-.bottom-bar a:hover span.material-symbols-outlined {
-    transform: translateY(-2px);
-    color: #3498db;
-}
+        .bottom-bar a:hover span.material-symbols-outlined {
+            transform: translateY(-2px);
+            color: #3498db;
+        }
 
-/* 🔹 Ajuste para celulares pequeños */
-@media (max-width: 480px) {
-    .bottom-bar {
-        padding: 22px 0; /* 🔹 aún más alto en iPhone SE y similares */
-    }
+        .bottom-bar a:hover span {
+            color: #3498db;
+        }
 
+        @media (max-width: 768px) {
+            .bottom-bar { padding: 8px 0; }
+        }
+        @media (max-width: 600px) {
     .bottom-bar a span.material-symbols-outlined {
-        font-size: 44px; /* 🔹 aún más grande */
+        font-size: 24px;
     }
 
     .bottom-bar img {
-        width: 44px;
-        height: 44px;
+        width: 24px;
+        height: 24px;
     }
 
     .bottom-bar a {
-        font-size: 16px;
+        font-size: 11px;
     }
 }
-
-/* 🔹 Ajuste para pantallas grandes (PC o tablets) */
-@media (min-width: 1024px) {
-    .bottom-bar {
-        padding: 20px 0;
-    }
-
-    .bottom-bar a span.material-symbols-outlined {
-        font-size: 42px;
-    }
-
-    .bottom-bar img {
-        width: 42px;
-        height: 42px;
-    }
-
-    .bottom-bar a {
-        font-size: 16px;
-    }
-}
-
-
 
     </style>
 </head>
