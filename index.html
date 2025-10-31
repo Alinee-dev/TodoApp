@@ -90,8 +90,8 @@ window.addEventListener("load", () => {
 
         .task-summary-count, .event-date { font-weight: bold; color: #3498db; }
 
- /* ===============================
-   Bottom Bar (Adaptable para móvil y PC)
+/* ===============================
+   Bottom Bar (Versión adaptada para iPhone y PC)
 =============================== */
 .bottom-bar {
     position: fixed;
@@ -102,11 +102,14 @@ window.addEventListener("load", () => {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 16px 0; /* 🔹 más alto para pantallas grandes */
-    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    padding: 18px 0; /* 🔹 más alto por defecto */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* 🔹 asegura altura en iPhone */
     box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
     border-top: 1px solid #ddd;
     z-index: 9999;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .bottom-bar a {
@@ -115,25 +118,27 @@ window.addEventListener("load", () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 14px; /* 🔹 texto más legible */
+    font-size: 15px; /* 🔹 más grande para pantallas táctiles */
     transition: 0.3s;
+    line-height: 1.4;
 }
 
 .bottom-bar a span.material-symbols-outlined {
-    font-size: 36px; /* 🔹 íconos más grandes */
+    font-size: 40px; /* 🔹 íconos grandes en iPhone */
     margin-bottom: 6px;
     transition: transform 0.2s, color 0.2s;
     color: #555;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .bottom-bar img {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     filter: brightness(0) invert(0);
     transition: 0.3s;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* Estado activo o hover */
 .bottom-bar a.active img,
 .bottom-bar a:hover img {
     filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1);
@@ -144,56 +149,48 @@ window.addEventListener("load", () => {
     color: #3498db;
 }
 
-.bottom-bar a.active span {
-    color: #3498db;
-}
-
 .bottom-bar a:hover span.material-symbols-outlined {
     transform: translateY(-2px);
     color: #3498db;
 }
 
-.bottom-bar a:hover span {
-    color: #3498db;
-}
-
-/* 🔹 Ajuste para celulares */
-@media (max-width: 768px) {
+/* 🔹 Ajuste para celulares pequeños */
+@media (max-width: 480px) {
     .bottom-bar {
-        padding: 12px 0;
+        padding: 22px 0; /* 🔹 aún más alto en iPhone SE y similares */
     }
 
     .bottom-bar a span.material-symbols-outlined {
-        font-size: 30px;
+        font-size: 44px; /* 🔹 aún más grande */
     }
 
     .bottom-bar img {
-        width: 30px;
-        height: 30px;
+        width: 44px;
+        height: 44px;
     }
 
     .bottom-bar a {
-        font-size: 12px;
+        font-size: 16px;
     }
 }
 
-/* 🔹 Ajuste para pantallas grandes (PC o tablets horizontales) */
+/* 🔹 Ajuste para pantallas grandes (PC o tablets) */
 @media (min-width: 1024px) {
     .bottom-bar {
-        padding: 18px 0;
+        padding: 20px 0;
     }
 
     .bottom-bar a span.material-symbols-outlined {
-        font-size: 40px;
+        font-size: 42px;
     }
 
     .bottom-bar img {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
     }
 
     .bottom-bar a {
-        font-size: 15px;
+        font-size: 16px;
     }
 }
 
