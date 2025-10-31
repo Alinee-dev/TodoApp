@@ -3,7 +3,7 @@
 // ===============================
 
 // 💡 Cambia este número en cada versión nueva
-const CACHE_NAME = "apptodo-v7";
+const CACHE_NAME = "apptodo-v9";
 
 // Archivos a guardar en caché
 const urlsToCache = [
