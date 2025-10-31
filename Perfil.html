@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Perfil</title>
     <style>
         body {
@@ -120,6 +120,42 @@
             font-weight: bold;
         }
 
+        /* --- BOTONES EXPORTAR / IMPORTAR --- */
+        .backup-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .backup-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .export-btn {
+            background-color: #3498db;
+        }
+
+        .export-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .import-btn {
+            background-color: #9b59b6;
+        }
+
+        .import-btn:hover {
+            background-color: #8e44ad;
+        }
+
         /* ===============================
         Bottom Bar
         ============================== */
@@ -133,6 +169,7 @@
             justify-content: space-around;
             align-items: center;
             padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
             box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
             border-top: 1px solid #ddd;
             z-index: 9999;
@@ -162,6 +199,17 @@
 
         @media (max-width: 768px) {
             .bottom-bar { padding: 8px 0; }
+        }
+
+        @media (max-width: 600px) {
+            .bottom-bar img {
+                width: 24px;
+                height: 24px;
+            }
+
+            .bottom-bar a {
+                font-size: 11px;
+            }
         }
     </style>
 
@@ -209,6 +257,11 @@ window.addEventListener('load', () => {
         </div>
 
         <button class="edit-profile-btn" id="saveProfileBtn">Guardar Cambios</button>
+        <div class="backup-buttons">
+            <button class="export-btn" id="exportBtn">📤 Exportar Todo</button>
+            <button class="import-btn" id="importBtn">📥 Importar Todo</button>
+        </div>
+
         <p id="statusMessage" class="status-message"></p>
     </div>
 
@@ -234,6 +287,8 @@ window.addEventListener('load', () => {
             const statusMessage = document.getElementById('statusMessage');
             const profileImage = document.getElementById('profileImage');
             const changePhotoBtn = document.getElementById('changePhotoBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
 
             // Cargar datos desde localStorage
             const savedProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
@@ -273,6 +328,50 @@ window.addEventListener('load', () => {
                     }
                 };
                 fileInput.click();
+            });
+
+            // 📤 Exportar todo
+            exportBtn.addEventListener('click', () => {
+                const allData = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    allData[key] = localStorage.getItem(key);
+                }
+                const blob = new Blob([JSON.stringify(allData, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "Apptodo_backup.json";
+                a.click();
+                URL.revokeObjectURL(url);
+                statusMessage.textContent = "Datos exportados correctamente ✅";
+                setTimeout(() => { statusMessage.textContent = ""; }, 3000);
+            });
+
+            // 📥 Importar todo
+            importBtn.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const importedData = JSON.parse(event.target.result);
+                            for (const key in importedData) {
+                                localStorage.setItem(key, importedData[key]);
+                            }
+                            statusMessage.textContent = "Datos importados correctamente ✅";
+                            setTimeout(() => location.reload(), 2000);
+                        } catch {
+                            statusMessage.textContent = "Error al importar datos ❌";
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
             });
         });
     </script>

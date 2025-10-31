@@ -7,56 +7,56 @@ const CACHE_NAME = "apptodo-v3"; // ⬅️ cambia el número al subir una nueva 
 
 // Archivos a guardar en caché
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/calendario.html",
-  "/diario.html",
-  "/finanzas.html",
-  "/tareas.html",
-  "/perfil.html",
-  "/manifest.json",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png"
+"/",
+"/index.html",
+"/calendario.html",
+"/diario.html",
+"/finanzas.html",
+"/tareas.html",
+"/perfil.html",
+"/manifest.json",
+"/icons/icon-192.png",
+"/icons/icon-512.png"
 ];
 
 // ✅ INSTALACIÓN - Guarda los archivos en caché y activa al instante
 self.addEventListener("install", (event) => {
-  console.log("Instalando nuevo Service Worker...");
+console.log("Instalando nuevo Service Worker...");
   self.skipWaiting(); // 🔁 fuerza la activación inmediata del nuevo SW
-  event.waitUntil(
+event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("Archivos cacheados correctamente");
-      return cache.addAll(urlsToCache);
+    console.log("Archivos cacheados correctamente");
+    return cache.addAll(urlsToCache);
     })
-  );
+);
 });
 
 // 🧹 ACTIVACIÓN - Elimina cachés antiguos y actualiza todas las pestañas abiertas
 self.addEventListener("activate", (event) => {
-  console.log("Service Worker activado y limpiando cachés viejas...");
-  event.waitUntil(
+console.log("Service Worker activado y limpiando cachés viejas...");
+event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
+    Promise.all(
         keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
+        .filter((key) => key !== CACHE_NAME)
+        .map((key) => caches.delete(key))
     )
-  );
+    )
+);
   self.clients.claim(); // ⚡ aplica la nueva versión a todos los usuarios
 });
 
 // ⚙️ FETCH - Responde con caché o red (funciona incluso offline)
 self.addEventListener("fetch", (event) => {
-  event.respondWith(
+event.respondWith(
     caches.match(event.request).then((response) => {
-      return (
+    return (
         response ||
         fetch(event.request).then((networkResponse) => {
           // Opcional: guarda en caché nuevos recursos si lo deseas
-          return networkResponse;
+        return networkResponse;
         })
-      );
+    );
     })
-  );
+);
 });

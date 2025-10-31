@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Diario Personal ✍️</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -258,7 +258,7 @@
         }
 
         /* ===============================
-           Bottom Bar (DISEÑO ORIGINAL DEL USUARIO)
+        ottom Bar (DISEÑO ORIGINAL DEL USUARIO)
         ============================== */
         .bottom-bar {
             position: fixed;
@@ -270,6 +270,7 @@
             justify-content: space-around;
             align-items: center;
             padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* <- IMPORTANTE */
             box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
             border-top: 1px solid #ddd;
             z-index: 9999;
@@ -326,6 +327,22 @@
             .journal-container { margin: 10px auto; padding: 20px; } /* Ajuste de contenedor para móvil */
             #journal-entry { min-height: 300px; } /* Ajuste de área de texto para móvil */
         }
+
+        @media (max-width: 600px) {
+    .bottom-bar a span.material-symbols-outlined {
+        font-size: 24px;
+    }
+
+    .bottom-bar img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .bottom-bar a {
+        font-size: 11px;
+    }
+}
+
     </style>
 
 <link rel="manifest" href="manifest.json">
@@ -386,12 +403,12 @@ window.addEventListener('load', () => {
 </div>
 
 <div class="bottom-bar">
-        <a href="index.html" class="active"><img src="images/inicio.png" alt="Inicio"></a>
-        <a href="Calendario.html" class="active"><img src="images/calendario.png" alt="Calendario"></a>
-        <a href="Tareas.html" class="active"><img src="images/tareas.png" alt="Tareas"></a>
+        <a href="index.html"><img src="images/inicio.png" alt="Inicio"></a>
+        <a href="Calendario.html"><img src="images/calendario.png" alt="Calendario"></a>
+        <a href="Tareas.html"><img src="images/tareas.png" alt="Tareas"></a>
         <a href="Diario.html" class="active"><img src="images/diario.png" alt="Diario"></a>
-        <a href="Finanzas.html" class="active"><img src="images/finanzas.png" alt="Finanzas"></a>
-        <a href="Perfil.html" class="active"><img src="images/perfil.png" alt="Perfil"></a>
+        <a href="Finanzas.html"><img src="images/finanzas.png" alt="Finanzas"></a>
+        <a href="Perfil.html"><img src="images/perfil.png" alt="Perfil"></a>
     </div>
 
 <script>
